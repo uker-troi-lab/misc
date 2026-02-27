@@ -43,7 +43,7 @@ cache:
   script:
     - cd tests
     - uv run python -m coverage run -m unittest
-    - uv run coverage xml
+    - uv run coverage --omit="*/_remote_module_non_scriptable.py" xml
     - uv cache prune --ci
   coverage: '/TOTAL.*\s+(\d+%)$/'
   artifacts:
@@ -51,7 +51,7 @@ cache:
     reports:
       coverage_report:
         coverage_format: cobertura  # or jacoco
-        path: coverage.xml
+        path: coverage/coverage.xml
 
 
 .linter_template:
