@@ -43,8 +43,15 @@ cache:
   script:
     - cd tests
     - uv run python -m coverage run -m unittest
-    - uv run coverage report --omit="/tmp*"
+    - uv run coverage xml
     - uv cache prune --ci
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    expire_in: 1 week
+    reports:
+      coverage_report:
+        coverage_format: cobertura  # or jacoco
+        path: coverage.xml
 
 
 .linter_template:
