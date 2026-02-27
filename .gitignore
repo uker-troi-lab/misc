@@ -1,0 +1,14 @@
+/*
+/*/*
+
+!.gitignore
+!LICENSE
+README.md
+
+!/scripts/
+!/scripts/python
+!/ci
+
+!*.py
+!*.sh
+!*.yml
