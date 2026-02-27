@@ -26,7 +26,7 @@ cache:
 
   before_script:
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - conda create -n venv-$CI_PROJECT_NAME -y
+    - conda create -n venv-$CI_PROJECT_NAME -y python=3.13
     - conda activate venv-$CI_PROJECT_NAME
     - conda install pip -y
     - export UV_PYTHON=$(which python)
