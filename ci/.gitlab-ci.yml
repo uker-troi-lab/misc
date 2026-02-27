@@ -43,15 +43,9 @@ cache:
   script:
     - cd tests
     - uv run coverage run -m test_suite
-    - uv run coverage xml --omit="*/_remote_module_non_scriptable.py"
+    - uv run coverage report --omit="*/_remote_module_non_scriptable.py"
     - uv cache prune --ci
-  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-  artifacts:
-    expire_in: 1 week
-    reports:
-      coverage_report:
-        coverage_format: cobertura  # or jacoco
-        path: tests/coverage.xml
+  coverage: '*TOTAL.*\s+(\d+%)$*'
 
 
 .linter_template:
@@ -60,6 +54,7 @@ cache:
     - uv run ruff check --config pyproject.toml --output-format=gitlab > code-quality-report.json
     - uv cache prune --ci
   artifacts:
+    expire_in: 1 week
     reports:
       codequality: $CI_PROJECT_DIR/code-quality-report.json
 
