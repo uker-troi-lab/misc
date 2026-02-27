@@ -45,7 +45,7 @@ cache:
     - uv run python -m coverage run -m unittest
     - uv run coverage xml --omit="*/_remote_module_non_scriptable.py"
     - uv cache prune --ci
-  coverage: '/TOTAL.*\s+(\d+%)$/'
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     expire_in: 1 week
     reports:
