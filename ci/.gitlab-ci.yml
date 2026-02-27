@@ -42,7 +42,7 @@ cache:
   extends: .base_template
   script:
     - cd tests
-    - uv run python -m coverage run -m unittest
+    - uv run coverage run -m test_suite
     - uv run coverage xml --omit="*/_remote_module_non_scriptable.py"
     - uv cache prune --ci
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -51,7 +51,7 @@ cache:
     reports:
       coverage_report:
         coverage_format: cobertura  # or jacoco
-        path: coverage/coverage.xml
+        path: coverage.xml
 
 
 .linter_template:
