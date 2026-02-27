@@ -43,7 +43,7 @@ cache:
   script:
     - cd tests
     - uv run python -m coverage run -m unittest
-    - uv run coverage report
+    - uv run coverage report --omit="/tmp*"
     - uv cache prune --ci
 
 
