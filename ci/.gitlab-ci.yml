@@ -51,7 +51,7 @@ cache:
     reports:
       coverage_report:
         coverage_format: cobertura  # or jacoco
-        path: coverage.xml
+        path: tests/coverage.xml
 
 
 .linter_template:
