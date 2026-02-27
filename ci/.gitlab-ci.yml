@@ -43,7 +43,7 @@ cache:
   script:
     - cd tests
     - uv run python -m coverage run -m unittest
-    - uv run coverage --omit="*/_remote_module_non_scriptable.py" xml
+    - uv run coverage xml --omit="*/_remote_module_non_scriptable.py"
     - uv cache prune --ci
   coverage: '/TOTAL.*\s+(\d+%)$/'
   artifacts:
