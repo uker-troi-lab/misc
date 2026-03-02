@@ -64,16 +64,3 @@ cache:
   script:
     - uv run ruff format --config pyproject.toml --diff
     - uv cache prune --ci
-
-
-unittest:
-  extends: .unittest_template
-  stage: unittest
-
-linter:
-  extends: .linter_template
-  stage: linter
-
-formatter:
-  extends: .formatter_template
-  stage: formatter
