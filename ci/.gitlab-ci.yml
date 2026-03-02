@@ -21,8 +21,8 @@ cache:
 
   before_script:
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - conda create -n venv-$CI_PROJECT_NAME -y python=3.13
-    - conda activate venv-$CI_PROJECT_NAME
+    - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
+    - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     - conda install pip -y
     - export UV_PYTHON=$(which python)
     - pip install uv
@@ -34,7 +34,7 @@ cache:
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
     - ENV_PATH="$CONDA_PREFIX"
     - conda deactivate || true
-    - conda remove -n venv-$CI_PROJECT_NAME --all -y || true
+    - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
     - rm -rf "$ENV_PATH" || true
 
 
