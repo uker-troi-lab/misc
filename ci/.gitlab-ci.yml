@@ -43,8 +43,8 @@ cache:
   script:
     - cd tests
     - uv run coverage run -m test_suite
-    #- uv run coverage report --omit="*/_remote_module_non_scriptable.py"
-    - uv run coverage report
+    - uv run coverage report --omit="*/_remote_module_non_scriptable*"
+    #- uv run coverage report
     - uv cache prune --ci
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
