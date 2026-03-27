@@ -11,14 +11,23 @@ cache:
       - $UV_CACHE_DIR
 
 
-.base_template:
+.basic_template:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
       when: always
     - if: '$CI_MERGE_REQUEST_ID'
       when: always
     - when: never
+  after_script:
+    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
+    - ENV_PATH="$CONDA_PREFIX"
+    - conda deactivate || true
+    - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
+    - rm -rf "$ENV_PATH" || true
 
+
+.base_template:
+  extends: .basic_template
   before_script:
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
     - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
@@ -29,14 +38,6 @@ cache:
     - cd $CI_PROJECT_DIR
     - uv sync --all-extras
     - uv run ruff --version
-
-  after_script:
-    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - ENV_PATH="$CONDA_PREFIX"
-    - conda deactivate || true
-    - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
-    - rm -rf "$ENV_PATH" || true
-
 
 .unittest_template:
   extends: .base_template
@@ -68,8 +69,16 @@ cache:
 
 
 .check_dependencies:
-  extends: .base_template
-  script:
+  extends: .basic_template
+  before_script:
+    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
+    - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
+    - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    - conda install pip -y
+    - export UV_PYTHON=$(which python)
+    - pip install uv
+    - cd $CI_PROJECT_DIR
     - uv pip install check-dependencies
+  script:
     - uv run check-depencencies --all ./src
     - uv cache prune --ci
