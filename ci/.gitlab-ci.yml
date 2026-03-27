@@ -71,5 +71,5 @@ cache:
   extends: .base_template
   script:
     - uv pip install check-dependencies
-    - uv run check-depencencies --all ./src
+    - check-depencencies --all ./src
     - uv cache prune --ci
