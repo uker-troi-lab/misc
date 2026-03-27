@@ -80,5 +80,5 @@ cache:
     - cd $CI_PROJECT_DIR
     - uv pip install check-dependencies
   script:
-    - uv run check-depencencies --all ./src
+    - uv run check-dependencies --all ./src
     - uv cache prune --ci
