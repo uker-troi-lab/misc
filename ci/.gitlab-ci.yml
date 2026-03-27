@@ -43,7 +43,8 @@ cache:
   script:
     - cd tests
     - uv run coverage run -m test_suite
-    - uv run coverage report --omit="*/_remote_module_non_scriptable.py"
+    #- uv run coverage report --omit="*/_remote_module_non_scriptable.py"
+    - uv run coverage report
     - uv cache prune --ci
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
@@ -63,4 +64,12 @@ cache:
   extends: .base_template
   script:
     - uv run ruff format --config pyproject.toml --diff
+    - uv cache prune --ci
+
+
+.check_dependencies:
+  extends: .base_template
+  script:
+    - uv add check-dependencies
+    - uv run check-depencencies --all ./src
     - uv cache prune --ci
