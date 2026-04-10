@@ -35,15 +35,14 @@ cache:
 
 
 .base_template:
-  extends: .basic_template
-  variables:
-    UV_PROJECT_ENVIRONMENT: venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+  extends: .basic_template    
   before_script:
     #- source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
     #- conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
     #- conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     #- conda install pip -y
     - export UV_PYTHON=$(which python)
+    - export UV_PROJECT_ENVIRONMENT=venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     #- pip install uv
     - cd $CI_PROJECT_DIR
     - echo $UV_PROJECT_ENVIRONMENT
