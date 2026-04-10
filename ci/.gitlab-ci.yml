@@ -78,7 +78,7 @@ cache:
     - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     - conda install pip -y
     - export UV_PYTHON=$(which python)
-    - export UV_PROJECT_ENVIRONMENT=venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    - export UV_PROJECT_ENVIRONMENT=/home/gitlab-runner/.conda/envs/venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     - pip install uv
     - cd $CI_PROJECT_DIR
     - echo $UV_PROJECT_ENVIRONMENT
