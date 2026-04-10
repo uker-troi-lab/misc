@@ -2,13 +2,6 @@ variables:
   UV_CACHE_DIR: .uv-cache
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
-  # https://docs.astral.sh/uv/guides/integration/gitlab/
-  UV_VERSION: "0.11.6"
-  PYTHON_VERSION: "3.13"
-  BASE_LAYER: trixie-slim
-  # GitLab CI creates a separate mountpoint for the build directory,
-  # so we need to copy instead of using hard links.
-  UV_LINK_MODE: copy
 
 cache:
   - key:
@@ -19,7 +12,6 @@ cache:
 
 
 .basic_template:
-  image: ghcr.io/astral-sh/uv:$UV_VERSION-python$PYTHON_VERSION-$BASE_LAYER
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
       when: always
@@ -28,23 +20,23 @@ cache:
     - when: never
   after_script:
     - uv cache prune --ci
-    #- source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    #- ENV_PATH="$CONDA_PREFIX"
-    #- conda deactivate || true
-    #- conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
-    #- rm -rf "$ENV_PATH" || true
+    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
+    - ENV_PATH="$CONDA_PREFIX"
+    - conda deactivate || true
+    - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
+    - rm -rf "$ENV_PATH" || true
 
 
 .base_template:
   extends: .basic_template    
   before_script:
-    #- source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    #- conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
-    #- conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    #- conda install pip -y
+    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
+    - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
+    - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    - conda install pip -y
     - export UV_PYTHON=$(which python)
     - export UV_PROJECT_ENVIRONMENT=venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    #- pip install uv
+    - pip install uv
     - cd $CI_PROJECT_DIR
     - echo $UV_PROJECT_ENVIRONMENT
     - uv sync --all-extras
@@ -79,13 +71,15 @@ cache:
 .check_dependencies:
   extends: .basic_template
   before_script:
-    #- source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    #- conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
-    #- conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    #- conda install pip -y
+    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
+    - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
+    - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    - conda install pip -y
     - export UV_PYTHON=$(which python)
-    #- pip install uv
+    - export UV_PROJECT_ENVIRONMENT=venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    - pip install uv
     - cd $CI_PROJECT_DIR
+    - echo $UV_PROJECT_ENVIRONMENT
     - uv pip install check-dependencies
   script:
     - uv run check-dependencies --all ./src
