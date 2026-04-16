@@ -19,6 +19,7 @@ cache:
       when: always
     - when: never
   environment:
+    name: $CI_COMMIT_REF_SLUG
     on_stop: cleanup_conda
 
 cleanup_conda:
@@ -91,6 +92,7 @@ cleanup_conda:
     - echo $UV_PROJECT_ENVIRONMENT
     - uv pip install check-dependencies
   environment:
+    name: $CI_COMMIT_REF_SLUG
     on_stop: cleanup_conda
   script:
     - uv run check-dependencies --all ./src
