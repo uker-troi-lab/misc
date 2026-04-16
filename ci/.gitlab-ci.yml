@@ -90,6 +90,8 @@ cleanup_conda:
     - cd $CI_PROJECT_DIR
     - echo $UV_PROJECT_ENVIRONMENT
     - uv pip install check-dependencies
+  environment:
+    on_stop: cleanup_conda
   script:
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
