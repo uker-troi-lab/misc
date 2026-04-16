@@ -22,7 +22,7 @@ cache:
 
 cleanup_conda:
   script:
-    - echo "Removing conda-env: venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID"
+    - echo "Removing conda-env venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID"
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
     - ENV_PATH="$CONDA_PREFIX"
     - conda deactivate || true
