@@ -10,6 +10,15 @@ cache:
     paths:
       - $UV_CACHE_DIR
 
+
+.basic_template:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
+      when: always
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: always
+    - when: never
+
 .setup_conda:
   extends: .basic_template
   script:
@@ -25,6 +34,7 @@ cache:
     - uv run ruff --version
 
 .cleanup_conda:
+  extends: .basic_template
   script:
     - echo "Removing conda-env venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID"
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
@@ -35,17 +45,7 @@ cache:
   when: manual
   environment:
     name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    action: stop 
-
-
-.basic_template:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
-      when: always
-    - if: '$CI_MERGE_REQUEST_ID'
-      when: always
-    - when: never
-
+    action: stop
 
 .base_template:
   extends: .basic_template    
