@@ -2,6 +2,7 @@ variables:
   UV_CACHE_DIR: .uv-cache
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
+  CONDA_ENV_NAME: venv-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG
 
 cache:
   - key:
@@ -23,38 +24,43 @@ cache:
   extends: .basic_template
   script:
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
+    - |
+      if conda info --envs | grep -q "$CONDA_ENV_NAME"; then
+        echo "Environment $CONDA_ENV_NAME already exists."
+      else
+        echo "Creating environment $CONDA_ENV_NAME..."
+        conda create -n "$CONDA_ENV_NAME" -y python=3.13
+      fi
+    - conda activate "$CONDA_ENV_NAME"
     - conda install pip -y
-    - export UV_PYTHON=$(which python)
-    - export UV_PROJECT_ENVIRONMENT=/home/gitlab-runner/.conda/envs/venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     - pip install uv
-    - cd $CI_PROJECT_DIR
-    - echo $UV_PROJECT_ENVIRONMENT
+    - export UV_PYTHON=$(which python)
+    - export UV_PROJECT_ENVIRONMENT="$CONDA_PREFIX"
+    - cd "$CI_PROJECT_DIR"
+    - echo "$UV_PROJECT_ENVIRONMENT"
     - uv sync --all-extras
     - uv run ruff --version
 
 .cleanup_conda:
   extends: .basic_template
   script:
-    - echo "Removing conda-env venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID"
+    - echo "Removing conda-env $CONDA_ENV_NAME"
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - ENV_PATH="$CONDA_PREFIX"
     - conda deactivate || true
-    - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
-    - rm -rf "$ENV_PATH" || true
+    - conda remove -n "$CONDA_ENV_NAME" --all -y || true
   when: manual
   environment:
-    name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    name: $CI_COMMIT_REF_SLUG
     action: stop
 
 .base_template:
   extends: .basic_template    
   before_script:
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
+    - conda activate "$CONDA_ENV_NAME"
     - export UV_PYTHON=$(which python)
-    - export UV_PROJECT_ENVIRONMENT=/home/gitlab-runner/.conda/envs/venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    - cd $CI_PROJECT_DIR
+    - export UV_PROJECT_ENVIRONMENT="$CONDA_PREFIX"
+    - cd "$CI_PROJECT_DIR"
 
 .unittest_template:
   extends: .base_template
@@ -86,18 +92,8 @@ cache:
 
 
 .check_dependencies:
-  extends: .basic_template
-  before_script:
-    - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
-    - conda create -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID -y python=3.13
-    - conda activate venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    - conda install pip -y
-    - export UV_PYTHON=$(which python)
-    - export UV_PROJECT_ENVIRONMENT=/home/gitlab-runner/.conda/envs/venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    - pip install uv
-    - cd $CI_PROJECT_DIR
-    - echo $UV_PROJECT_ENVIRONMENT
-    - uv pip install check-dependencies
+  extends: .base_template
   script:
+    - uv pip install check-dependencies
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
