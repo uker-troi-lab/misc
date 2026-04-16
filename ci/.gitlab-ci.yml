@@ -20,9 +20,10 @@ cache:
     - when: never
   environment:
     name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    on_stop: .cleanup_conda
+    on_stop: cleanup_conda
 
-.cleanup_conda:
+cleanup_conda:
+  stage: .post
   script:
     - echo "Removing conda-env venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID"
     - source /home/gitlab-runner/miniconda3/etc/profile.d/conda.sh
@@ -94,7 +95,7 @@ cache:
     - uv pip install check-dependencies
   environment:
     name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
-    on_stop: .cleanup_conda
+    on_stop: cleanup_conda
   script:
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
