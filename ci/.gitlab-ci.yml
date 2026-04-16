@@ -19,7 +19,7 @@ cache:
       when: always
     - when: never
   environment:
-    name: $CI_COMMIT_REF_SLUG
+    name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     on_stop: cleanup_conda
 
 cleanup_conda:
@@ -31,7 +31,7 @@ cleanup_conda:
     - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
     - rm -rf "$ENV_PATH" || true
   environment:
-    name: $CI_COMMIT_REF_SLUG
+    name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     action: stop
 
 
@@ -93,7 +93,7 @@ cleanup_conda:
     - echo $UV_PROJECT_ENVIRONMENT
     - uv pip install check-dependencies
   environment:
-    name: $CI_COMMIT_REF_SLUG
+    name: $CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID
     on_stop: cleanup_conda
   script:
     - uv run check-dependencies --all ./src
