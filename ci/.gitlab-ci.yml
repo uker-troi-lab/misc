@@ -31,6 +31,7 @@ cleanup_conda:
     - conda remove -n venv-$CI_PROJECT_NAME-$CI_MERGE_REQUEST_ID --all -y || true
     - rm -rf "$ENV_PATH" || true
   environment:
+    name: $CI_COMMIT_REF_SLUG
     action: stop
 
 
