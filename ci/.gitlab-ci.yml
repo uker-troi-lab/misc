@@ -18,7 +18,8 @@ cache:
     - if: '$CI_MERGE_REQUEST_ID'
       when: always
     - when: never
-  on_stop: cleanup_conda
+  environment:
+    on_stop: cleanup_conda
 
 cleanup_conda:
   script:
