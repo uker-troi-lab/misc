@@ -1,5 +1,5 @@
 variables:
-  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
+  UV_CACHE_DIR: .uv-cache
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
 
@@ -27,8 +27,11 @@ cache:
 
     - cd "$CI_PROJECT_DIR"
 
+    # ensure deterministic cache location
+    - export UV_CACHE_DIR=".uv-cache"
+
     # install deps into container venv
-    - uv sync --all-extras
+    - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
 
 
