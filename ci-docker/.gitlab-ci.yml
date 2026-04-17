@@ -1,5 +1,5 @@
 variables:
-  UV_CACHE_DIR: .uv-cache
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
 
@@ -8,7 +8,7 @@ cache:
       files:
         - uv.lock
     paths:
-      - .uv-cache/
+      - $UV_CACHE_DIR
 
 
 .basic_template:
