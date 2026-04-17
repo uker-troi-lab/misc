@@ -27,9 +27,6 @@ cache:
 
     - cd "$CI_PROJECT_DIR"
 
-    # ensure deterministic cache location
-    - export UV_CACHE_DIR=".uv-cache"
-
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
