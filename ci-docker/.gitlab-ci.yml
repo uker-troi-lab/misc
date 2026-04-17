@@ -1,0 +1,72 @@
+variables:
+  UV_CACHE_DIR: .uv-cache
+  GIT_STRATEGY: fetch
+  GIT_CLEAN_FLAGS: none
+
+cache:
+  - key:
+      files:
+        - uv.lock
+    paths:
+      - $UV_CACHE_DIR
+
+
+.basic_template:
+  image: troi-python-ci:latest
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
+      when: always
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: always
+    - when: never
+
+  before_script:
+    # allow access to private repos
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@git.uk-erlangen.de/".insteadOf "https://git.uk-erlangen.de/"
+
+    - cd "$CI_PROJECT_DIR"
+
+    # install deps into container venv
+    - uv sync --all-extras
+    - uv run ruff --version
+
+
+.base_template:
+  extends: .basic_template
+
+
+.unittest_template:
+  extends: .base_template
+  script:
+    - cd tests
+    - uv run coverage run -m test_suite
+    - uv run coverage report --omit="*/_remote_module_non_scriptable*"
+    - uv cache prune --ci
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+
+
+.linter_template:
+  extends: .base_template
+  script:
+    - uv run ruff check --config pyproject.toml --output-format=gitlab > code-quality-report.json
+    - uv cache prune --ci
+  artifacts:
+    expire_in: 1 week
+    reports:
+      codequality: code-quality-report.json
+
+
+.formatter_template:
+  extends: .base_template
+  script:
+    - uv run ruff format --config pyproject.toml --diff
+    - uv cache prune --ci
+
+
+.check_dependencies:
+  extends: .base_template
+  script:
+    - uv pip install check-dependencies
+    - uv run check-dependencies --all ./src
+    - uv cache prune --ci
