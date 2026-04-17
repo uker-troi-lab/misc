@@ -12,7 +12,7 @@ cache:
 
 
 .basic_template:
-  image: troi-python-ci:latest
+  image: troi-docker-ci:latest
 
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
