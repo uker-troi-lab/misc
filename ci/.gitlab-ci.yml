@@ -22,9 +22,6 @@ cache:
     - when: never
 
   before_script:
-    # allow access to private repos
-    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@git.uk-erlangen.de/".insteadOf "https://git.uk-erlangen.de/"
-
     - cd "$CI_PROJECT_DIR"
 
     # install deps into container venv
