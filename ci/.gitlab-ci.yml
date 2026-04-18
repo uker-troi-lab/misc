@@ -11,7 +11,7 @@ cache:
       - $UV_CACHE_DIR
 
 
-.basic_template:
+.base_template:
   image: troi-docker-ci:latest
 
   rules:
@@ -23,15 +23,9 @@ cache:
 
   before_script:
     - cd "$CI_PROJECT_DIR"
-
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
-
-
-.base_template:
-  extends: .basic_template
-
 
 .unittest_template:
   extends: .base_template
@@ -41,7 +35,6 @@ cache:
     - uv run coverage report --omit="*/_remote_module_non_scriptable*"
     - uv cache prune --ci
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-
 
 .linter_template:
   extends: .base_template
@@ -53,13 +46,11 @@ cache:
     reports:
       codequality: code-quality-report.json
 
-
 .formatter_template:
   extends: .base_template
   script:
     - uv run ruff format --config pyproject.toml --diff
     - uv cache prune --ci
-
 
 .check_dependencies:
   extends: .base_template
