@@ -31,6 +31,7 @@ variables:
     - cd "$CI_PROJECT_DIR"
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
+    - uv pip install ruff coverage
     - uv run ruff --version
   cache:
     - key:
@@ -42,6 +43,7 @@ variables:
 .unittest_template:
   extends: .base_template
   script:
+    - uv pip install coverage
     - cd tests
     - uv run coverage run -m test_suite
     - uv run coverage report --omit="*/_remote_module_non_scriptable*"
