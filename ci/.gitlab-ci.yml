@@ -83,9 +83,10 @@ variables:
   before_script:
     - cd "$CI_PROJECT_DIR"
     # install deps into container venv
-    - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
+    # https://trivy.dev/docs/latest/scanner/license/#license-scanning
+    # trivy does not work for uv, so we need pip to install packages
+    - uv pip install -r pyproject.toml
   script:
-    # need to work on this: https://trivy.dev/docs/latest/coverage/language/python/#license-detection
     - trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
   artifacts:
     when: always
