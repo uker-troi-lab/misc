@@ -84,10 +84,9 @@ variables:
     - !reference [".trivy_setup", "before_script"]
     # install deps into container venv
     # https://trivy.dev/docs/latest/scanner/license/#license-scanning
-    # trivy does not work for uv, so we need pip to install packages
-    - uv pip install -r pyproject.toml
+    - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
   script:
-    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR $UV_CACHE_DIR
   artifacts:
     when: always
     reports:
