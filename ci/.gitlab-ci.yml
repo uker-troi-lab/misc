@@ -76,7 +76,7 @@ variables:
 .check_vulnerabilities:
   extends: .trivy_setup
   script:
-    - uv run trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
 
 .check_licenses:
   extends: .trivy_setup
@@ -86,7 +86,7 @@ variables:
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
   script:
     # need to work on this: https://trivy.dev/docs/latest/coverage/language/python/#license-detection
-    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
+    - trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
   artifacts:
     when: always
     reports:
