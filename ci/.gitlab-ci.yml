@@ -2,18 +2,12 @@ variables:
   UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
-
-cache:
-  - key:
-      files:
-        - uv.lock
-    paths:
-      - $UV_CACHE_DIR
+  TRIVY_CACHE_DIR: ".trivycache/"
+  TRIVY_VERSION: "0.70.0"
 
 
-.base_template:
+.basic_template:
   image: troi-docker-ci:latest
-
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
       when: always
@@ -21,11 +15,29 @@ cache:
       when: always
     - when: never
 
+.trivy_setup:
+  extends: .basic_template
+  before_script:
+    - apt-get update && apt-get install -y curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v$TRIVY_VERSION
+    - cd "$CI_PROJECT_DIR"
+  cache:
+    paths:
+      - $TRIVY_CACHE_DIR
+
+.base_template:
+  extends: .basic_template
   before_script:
     - cd "$CI_PROJECT_DIR"
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
+  cache:
+    - key:
+        files:
+          - uv.lock
+      paths:
+        - $UV_CACHE_DIR
 
 .unittest_template:
   extends: .base_template
@@ -58,3 +70,19 @@ cache:
     - uv pip install check-dependencies
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
+
+.check_vulnerabilities:
+  extends: .trivy_setup
+  script:
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
+
+.check_licenses:
+  extends: .trivy_setup
+  script:
+    - trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
+  artifacts:
+    when: always
+    reports:
+      license_scanning: license-scanning-report.json
+    paths:
+      - license-scanning-report.json
