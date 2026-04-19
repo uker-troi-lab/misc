@@ -76,12 +76,17 @@ variables:
 .check_vulnerabilities:
   extends: .trivy_setup
   script:
-    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
+    - uv run trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
 
 .check_licenses:
   extends: .trivy_setup
+  before_script:
+    - cd "$CI_PROJECT_DIR"
+    # install deps into container venv
+    - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
   script:
-    - trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
+    # need to work on this: https://trivy.dev/docs/latest/coverage/language/python/#license-detection
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR $UV_CACHE_DIR
   artifacts:
     when: always
     reports:
