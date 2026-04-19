@@ -76,18 +76,18 @@ variables:
 .check_vulnerabilities:
   extends: .trivy_setup
   script:
-    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
+    - uv run trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
 
 .check_licenses:
   extends: .trivy_setup
   before_script:
-    - cd "$CI_PROJECT_DIR"
+    - !reference [".trivy_setup", "before_script"]
     # install deps into container venv
     # https://trivy.dev/docs/latest/scanner/license/#license-scanning
     # trivy does not work for uv, so we need pip to install packages
     - uv pip install -r pyproject.toml
   script:
-    - trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
   artifacts:
     when: always
     reports:
