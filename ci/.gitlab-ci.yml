@@ -1,6 +1,8 @@
 variables:
   UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
-  UV_PROJECT_ENVIRONMENT: "$CI_PROJECT_DIR/.venv"
+  UV_SYSTEM_PYTHON: 1
+  UV_LINK_MODE: "copy"
+  #UV_PROJECT_ENVIRONMENT: "$CI_PROJECT_DIR/.venv"
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
   TRIVY_CACHE_DIR: ".trivycache/"
@@ -86,7 +88,7 @@ variables:
     # install deps into container venv
     # https://trivy.dev/docs/latest/scanner/license/#license-scanning
     # https://trivy.dev/docs/latest/coverage/language/python/#license-detection
-    - export VIRTUAL_ENV=$UV_PROJECT_ENVIRONMENT
+    #- export VIRTUAL_ENV=$UV_PROJECT_ENVIRONMENT
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
   script:
     - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
