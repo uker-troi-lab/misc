@@ -19,7 +19,7 @@ variables:
   extends: .basic_template
   before_script:
     - apt-get update && apt-get install -y curl
-    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v$TRIVY_VERSION
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v$TRIVY_VERSION
     - cd "$CI_PROJECT_DIR"
   cache:
     paths:
