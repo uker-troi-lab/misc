@@ -29,6 +29,7 @@ variables:
   extends: .basic_template
   before_script:
     - cd "$CI_PROJECT_DIR"
+    - echo $UV_PROJECT_ENVIRONMENT
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
     - uv pip install ruff coverage
@@ -86,7 +87,7 @@ variables:
     # https://trivy.dev/docs/latest/scanner/license/#license-scanning
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
   script:
-    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR $UV_CACHE_DIR
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR $UV_PROJECT_ENVIRONMENT
   artifacts:
     when: always
     reports:
