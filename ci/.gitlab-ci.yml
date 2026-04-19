@@ -85,6 +85,8 @@ variables:
     # install deps into container venv
     # https://trivy.dev/docs/latest/scanner/license/#license-scanning
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
+    # https://trivy.dev/docs/latest/coverage/language/python/#license-detection
+    - export VIRTUAL_ENV=$UV_CACHE_DIR/.venv
   script:
     - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
   artifacts:
