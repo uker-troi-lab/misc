@@ -24,7 +24,7 @@
     {
       "matchFileNames": [
         ".gitlab-ci.yml",
-        ".gitlab-ci-manual-conda"
+        ".gitlab-ci-manual-conda.yml"
       ]
     }
   ],
