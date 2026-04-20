@@ -23,7 +23,11 @@ variables:
   before_script:
     - apt-get update && apt-get install -y curl
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v$TRIVY_VERSION
-    - cd "$CI_PROJECT_DIR"
+    - cd $CI_PROJECT_DIR
+    - uv export --format requirements-txt --output-file requirements.txt
+  after_script:
+    - cd $CI_PROJECT_DIR
+    - rm -rf requirements.txt
   cache:
     paths:
       - $TRIVY_CACHE_DIR
@@ -31,7 +35,7 @@ variables:
 .base_template:
   extends: .basic_template
   before_script:
-    - cd "$CI_PROJECT_DIR"
+    - cd $CI_PROJECT_DIR
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
     - uv pip install ruff coverage
@@ -83,13 +87,6 @@ variables:
 
 .check_licenses:
   extends: .trivy_setup
-  before_script:
-    - !reference [".trivy_setup", "before_script"]
-    # install deps into container venv
-    # https://trivy.dev/docs/latest/scanner/license/#license-scanning
-    # https://trivy.dev/docs/latest/coverage/language/python/#license-detection
-    #- export VIRTUAL_ENV=$UV_PROJECT_ENVIRONMENT
-    - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
   script:
     - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
   artifacts:
@@ -97,4 +94,4 @@ variables:
     reports:
       license_scanning: license-scanning-report.json
     paths:
-      - license-scanning-report.json
+      - $CI_PROJECT_DIR/license-scanning-report.json
