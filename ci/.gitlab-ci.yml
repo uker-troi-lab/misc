@@ -1,6 +1,6 @@
 variables:
   UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
-  UV_SYSTEM_PYTHON: 1
+  #UV_SYSTEM_PYTHON: 1
   UV_LINK_MODE: "copy"
   #UV_PROJECT_ENVIRONMENT: "$CI_PROJECT_DIR/.venv"
   GIT_STRATEGY: fetch
@@ -38,8 +38,6 @@ variables:
     - cd $CI_PROJECT_DIR
     # install deps into container venv
     - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
-    - uv pip install ruff coverage
-    - uv run ruff --version
   cache:
     - key:
         files:
@@ -49,16 +47,26 @@ variables:
 
 .unittest_template:
   extends: .base_template
-  script:
+  before_script:
+    - !reference [".base_template", "before_script"]
     - uv pip install coverage
+  script:
     - cd tests
     - uv run coverage run -m test_suite
     - uv run coverage report --omit="*/_remote_module_non_scriptable*"
     - uv cache prune --ci
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
-.linter_template:
+
+.ruff_template:
   extends: .base_template
+  before_script:
+    - !reference [".base_template", "before_script"]
+    - uv pip install ruff
+    - uv run ruff --version
+  
+.linter_template:
+  extends: .ruff_template
   script:
     - uv run ruff check --config pyproject.toml --output-format=gitlab > code-quality-report.json
     - uv cache prune --ci
@@ -68,15 +76,17 @@ variables:
       codequality: code-quality-report.json
 
 .formatter_template:
-  extends: .base_template
+  extends: .ruff_template
   script:
     - uv run ruff format --config pyproject.toml --diff
     - uv cache prune --ci
 
 .check_dependencies:
   extends: .base_template
-  script:
+  before_script:
+    - !reference [".base_template", "before_script"]
     - uv pip install check-dependencies
+  script:
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
 
