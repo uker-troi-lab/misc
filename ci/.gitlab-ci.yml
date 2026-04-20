@@ -6,7 +6,7 @@ variables:
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
   TRIVY_CACHE_DIR: ".trivycache/"
-  TRIVY_VERSION: "0.70.0"
+  TRIVY_VERSION: "v0.70.0"
 
 # base templates to inherit from
 .basic_template:
@@ -21,8 +21,7 @@ variables:
 .trivy_setup:
   extends: .basic_template
   before_script:
-    - apt-get update && apt-get install -y curl
-    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v$TRIVY_VERSION
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin $TRIVY_VERSION
     - cd $CI_PROJECT_DIR
     - uv export --format requirements-txt --all-extras --all-groups --no-hashes --output-file requirements.txt
   after_script:
@@ -51,7 +50,7 @@ variables:
   extends: .base_template
   before_script:
     - !reference [".base_template", "before_script"]
-    - uv pip install coverage
+    - uv pip install coverage --cache-dir "$UV_CACHE_DIR"
   script:
     - cd tests
     - uv run coverage run -m test_suite
@@ -65,7 +64,7 @@ variables:
   extends: .base_template
   before_script:
     - !reference [".base_template", "before_script"]
-    - uv pip install ruff
+    - uv pip install ruff --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
   
 .linter_template:
@@ -89,7 +88,7 @@ variables:
   extends: .base_template
   before_script:
     - !reference [".base_template", "before_script"]
-    - uv pip install check-dependencies
+    - uv pip install check-dependencies --cache-dir "$UV_CACHE_DIR"
   script:
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
