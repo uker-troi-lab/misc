@@ -24,7 +24,7 @@ variables:
     - apt-get update && apt-get install -y curl
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v$TRIVY_VERSION
     - cd $CI_PROJECT_DIR
-    - uv export --format requirements-txt --output-file requirements.txt
+    - uv export --format requirements-txt --all-extras --all-groups --no-hashes --output-file requirements.txt
   after_script:
     - cd $CI_PROJECT_DIR
     - rm -rf requirements.txt
