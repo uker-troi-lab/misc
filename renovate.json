@@ -29,5 +29,14 @@
     }
   ],
   "dependencyDashboard": true,
-  "rebaseWhen": "behind-base-branch"
+  "rebaseWhen": "behind-base-branch",
+  "regexManagers": [
+    {
+      "fileMatch": ["^.gitlab-ci.yml$"],
+      "matchStrings": [
+        "renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s*.*?_VERSION: (?<currentValue>.*)\\s"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ]
 }
