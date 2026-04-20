@@ -33,9 +33,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^.gitlab-ci.yml$/"],
+      "managerFilePatterns": ["/.*gitlab-ci.*\\.yml$/"],
       "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s+TRIVY_VERSION: \"(?<currentValue>.*)\""],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-    }
+      "datasourceTemplate": "github-releases"
   ]
 }
