@@ -13,3 +13,5 @@ README.md
 !*.py
 !*.sh
 !*.yml
+
+!renovate.json

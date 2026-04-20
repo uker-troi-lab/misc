@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "assignees": [
+    "kapsner",
+    "hann-sch",
+    "ajugeorge97"
+  ],
+  "extends": [
+    ":preserveSemverRanges",
+    "group:all",
+    "config:recommended"
+  ],
+  "groupName": "all dependencies",
+  "separateMajorMinor": true,
+  "groupSlug": "all",
+  "packageRules": [
+    {
+      "groupName": "all dependencies",
+      "groupSlug": "all",
+      "matchPackageNames": [
+        "*"
+      ]
+    },
+    {
+      "matchFileNames": [
+        ".gitlab-ci.yml",
+        ".gitlab-ci-manual-conda"
+      ]
+    }
+  ],
+  "dependencyDashboard": true,
+  "rebaseWhen": "behind-base-branch"
+}
