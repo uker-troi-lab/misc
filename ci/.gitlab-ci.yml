@@ -8,7 +8,7 @@ variables:
   TRIVY_CACHE_DIR: ".trivycache/"
   TRIVY_VERSION: "0.70.0"
 
-
+# base templates to inherit from
 .basic_template:
   image: troi-docker-ci:latest
   rules:
@@ -45,6 +45,8 @@ variables:
       paths:
         - $UV_CACHE_DIR
 
+
+# unittest template
 .unittest_template:
   extends: .base_template
   before_script:
@@ -58,6 +60,7 @@ variables:
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
 
+# python linting and formatting
 .ruff_template:
   extends: .base_template
   before_script:
@@ -81,6 +84,7 @@ variables:
     - uv run ruff format --config pyproject.toml --diff
     - uv cache prune --ci
 
+# dependency checks
 .check_dependencies:
   extends: .base_template
   before_script:
@@ -90,6 +94,8 @@ variables:
     - uv run check-dependencies --all ./src
     - uv cache prune --ci
 
+
+# vulnerability and licensing checking
 .check_vulnerabilities:
   extends: .trivy_setup
   script:
@@ -99,9 +105,3 @@ variables:
   extends: .trivy_setup
   script:
     - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
-  artifacts:
-    when: always
-    reports:
-      license_scanning: license-scanning-report.json
-    paths:
-      - $CI_PROJECT_DIR/license-scanning-report.json
