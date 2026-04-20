@@ -30,12 +30,11 @@
   ],
   "dependencyDashboard": true,
   "rebaseWhen": "behind-base-branch",
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["^.gitlab-ci.yml$"],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s+TRIVY_VERSION: \"(?<currentValue>.*)\""
-      ],
+      "customType": "regex",
+      "managerFilePatterns": ["/^.gitlab-ci.yml$/"],
+      "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s+TRIVY_VERSION: \"(?<currentValue>.*)\""],
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     }
   ]
