@@ -6,6 +6,7 @@ variables:
   GIT_STRATEGY: fetch
   GIT_CLEAN_FLAGS: none
   TRIVY_CACHE_DIR: ".trivycache/"
+  # renovate: datasource=github-releases depName=aquasecurity/trivy
   TRIVY_VERSION: "v0.70.0"
 
 # base templates to inherit from
@@ -63,10 +64,10 @@ variables:
 .ruff_template:
   extends: .base_template
   before_script:
-    - !reference [".base_template", "before_script"]
+    - cd $CI_PROJECT_DIR
     - uv pip install ruff --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
-  
+
 .linter_template:
   extends: .ruff_template
   script:

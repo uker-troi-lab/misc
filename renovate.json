@@ -29,5 +29,13 @@
     }
   ],
   "dependencyDashboard": true,
-  "rebaseWhen": "behind-base-branch"
+  "rebaseWhen": "behind-base-branch",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^*.gitlab-ci*.yml$/"],
+      "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s+TRIVY_VERSION: \"(?<currentValue>.*)\""],
+      "datasourceTemplate": "github-releases"
+    }
+  ]
 }
