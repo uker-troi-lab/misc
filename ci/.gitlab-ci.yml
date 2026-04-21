@@ -98,9 +98,9 @@ variables:
 .check_vulnerabilities:
   extends: .trivy_setup
   script:
-    - uv run trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR .
+    - uv run trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR --skip-dirs .uv-cache .
 
 .check_licenses:
   extends: .trivy_setup
   script:
-    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR .
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR --skip-dirs .uv-cache .
