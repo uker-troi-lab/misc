@@ -62,17 +62,11 @@ variables:
 
 # python linting and formatting
 .ruff_template:
-  extends: .basic_template
+  extends: .base_template
   before_script:
     - cd $CI_PROJECT_DIR
     - uv pip install ruff --cache-dir "$UV_CACHE_DIR"
     - uv run ruff --version
-  cache:
-    - key:
-        files:
-          - uv.lock
-      paths:
-        - $UV_CACHE_DIR
 
 .linter_template:
   extends: .ruff_template
