@@ -65,13 +65,12 @@ variables:
   extends: .base_template
   before_script:
     - cd $CI_PROJECT_DIR
-    - uv pip install ruff --cache-dir "$UV_CACHE_DIR"
-    - uv run ruff --version
+    - uv run --with ruff ruff --version
 
 .linter_template:
   extends: .ruff_template
   script:
-    - uv run ruff check --config pyproject.toml --output-format=gitlab > code-quality-report.json
+    - uv run --with ruff ruff check --config pyproject.toml --output-format=gitlab > code-quality-report.json
     - uv cache prune --ci
   artifacts:
     expire_in: 1 week
@@ -81,7 +80,7 @@ variables:
 .formatter_template:
   extends: .ruff_template
   script:
-    - uv run ruff format --config pyproject.toml --diff
+    - uv run --with ruff ruff format --config pyproject.toml --diff
     - uv cache prune --ci
 
 # dependency checks
