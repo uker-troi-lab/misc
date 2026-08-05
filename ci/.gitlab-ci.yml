@@ -90,7 +90,7 @@ variables:
     - !reference [".base_template", "before_script"]
     - uv pip install 'check-dependencies<2.0.0' --cache-dir "$UV_CACHE_DIR"
   script:
-    - uv run check-dependencies --all ./src
+    - uv run check-dependencies --output-format full ./src
     - uv cache prune --ci
 
 
