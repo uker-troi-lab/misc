@@ -64,7 +64,7 @@ variables:
 .ruff_template:
   extends: .base_template
   before_script:
-    - cd $CI_PROJECT_DIR
+    - cd "$CI_PROJECT_DIR/$PACKAGE_DIR"
     - uv run --with ruff ruff --version
 
 .linter_template:
