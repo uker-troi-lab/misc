@@ -7,7 +7,7 @@ variables:
   GIT_CLEAN_FLAGS: none
   TRIVY_CACHE_DIR: ".trivycache/"
   # renovate: datasource=github-releases depName=aquasecurity/trivy
-  TRIVY_VERSION: "v0.72.0"
+  TRIVY_VERSION: "v0.76.1"
 
 # base templates to inherit from
 .basic_template:
@@ -75,7 +75,7 @@ variables:
   artifacts:
     expire_in: 1 week
     reports:
-      codequality: code-quality-report.json
+      codequality: $CI_PROJECT_DIR/code-quality-report.json
 
 .formatter_template:
   extends: .ruff_template
