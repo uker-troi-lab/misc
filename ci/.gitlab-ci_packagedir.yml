@@ -1,0 +1,106 @@
+variables:
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
+  #UV_SYSTEM_PYTHON: 1
+  UV_LINK_MODE: "copy"
+  #UV_PROJECT_ENVIRONMENT: "$CI_PROJECT_DIR/.venv"
+  GIT_STRATEGY: fetch
+  GIT_CLEAN_FLAGS: none
+  TRIVY_CACHE_DIR: ".trivycache/"
+  # renovate: datasource=github-releases depName=aquasecurity/trivy
+  TRIVY_VERSION: "v0.72.0"
+  PACKAGE_DIR: "."
+
+# base templates to inherit from
+.basic_template:
+  image: troi-docker-ci:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development"'
+      when: always
+    - if: '$CI_MERGE_REQUEST_ID'
+      when: always
+    - when: never
+
+.trivy_setup:
+  extends: .basic_template
+  before_script:
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin $TRIVY_VERSION
+    - cd "$CI_PROJECT_DIR/$PACKAGE_DIR"
+    - uv export --format requirements-txt --all-extras --all-groups --no-hashes --output-file requirements.txt
+  after_script:
+    - rm -f "$CI_PROJECT_DIR/$PACKAGE_DIR/requirements.txt"
+  cache:
+    paths:
+      - $TRIVY_CACHE_DIR
+
+.base_template:
+  extends: .basic_template
+  before_script:
+    - cd "$CI_PROJECT_DIR/$PACKAGE_DIR"
+    # install deps into container venv
+    - uv sync --all-extras --cache-dir "$UV_CACHE_DIR"
+  cache:
+    - key:
+        files:
+          - uv.lock
+      paths:
+        - $UV_CACHE_DIR
+
+
+# unittest template
+.unittest_template:
+  extends: .base_template
+  before_script:
+    - !reference [".base_template", "before_script"]
+    - uv pip install coverage --cache-dir "$UV_CACHE_DIR"
+  script:
+    - cd tests
+    - uv run coverage run -m test_suite
+    - uv run coverage report --omit="*/_remote_module_non_scriptable*"
+    - uv cache prune --ci
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+
+
+# python linting and formatting
+.ruff_template:
+  extends: .base_template
+  before_script:
+    - cd $CI_PROJECT_DIR
+    - uv run --with ruff ruff --version
+
+.linter_template:
+  extends: .ruff_template
+  script:
+    - uv run --with ruff ruff check --config pyproject.toml --output-format=gitlab > code-quality-report.json
+    - uv cache prune --ci
+  artifacts:
+    expire_in: 1 week
+    reports:
+      codequality: code-quality-report.json
+
+.formatter_template:
+  extends: .ruff_template
+  script:
+    - uv run --with ruff ruff format --config pyproject.toml --diff
+    - uv cache prune --ci
+
+# dependency checks
+.check_dependencies:
+  extends: .base_template
+  before_script:
+    - !reference [".base_template", "before_script"]
+    - uv pip install 'check-dependencies<2.0.0' --cache-dir "$UV_CACHE_DIR"
+  script:
+    - uv run check-dependencies --output-format full ./src
+    - uv cache prune --ci
+
+
+# vulnerability and licensing checking
+.check_vulnerabilities:
+  extends: .trivy_setup
+  script:
+    - uv run trivy fs --exit-code 1 --severity HIGH,CRITICAL --cache-dir $TRIVY_CACHE_DIR --skip-dirs .uv-cache .
+
+.check_licenses:
+  extends: .trivy_setup
+  script:
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR --skip-dirs .uv-cache .
