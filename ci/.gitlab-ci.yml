@@ -103,4 +103,4 @@ variables:
 .check_licenses:
   extends: .trivy_setup
   script:
-    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR --skip-dirs .uv-cache .
+    - uv run trivy fs --scanners license --exit-code 0 --cache-dir $TRIVY_CACHE_DIR --skip-dirs .uv-cache --skip-dirs .ruff-cache --skip-dirs .venv .
